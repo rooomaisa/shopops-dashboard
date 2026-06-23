@@ -15,5 +15,8 @@ spring:
 app:
   cors:
     allowed-origins: http://localhost:5173
+  jwt:
+    secret: shopops-test-jwt-secret-key-at-least-32-chars
+    expiration-ms: 86400000
   seed:
     enabled: false

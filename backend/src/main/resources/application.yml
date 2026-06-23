@@ -25,5 +25,8 @@ spring:
 app:
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:5174,http://localhost:5175}
+  jwt:
+    secret: ${JWT_SECRET:shopops-local-dev-jwt-secret-change-me-32chars}
+    expiration-ms: ${JWT_EXPIRATION_MS:86400000}
   seed:
     enabled: ${SEED_ENABLED:true}

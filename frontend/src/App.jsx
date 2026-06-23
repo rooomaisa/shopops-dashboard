@@ -1,19 +1,25 @@
-import { useEffect, useState } from 'react'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import ProtectedRoute from './components/ProtectedRoute'
+import DashboardPage from './pages/DashboardPage'
+import LoginPage from './pages/LoginPage'
+import RegisterPage from './pages/RegisterPage'
 
 export default function App() {
-  const [apiStatus, setApiStatus] = useState('checking...')
-
-  useEffect(() => {
-    fetch('/api/health')
-      .then((res) => res.json())
-      .then((data) => setApiStatus(data.status ?? 'unknown'))
-      .catch(() => setApiStatus('offline'))
-  }, [])
-
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-slate-900 text-white">
-      <h1 className="text-3xl font-bold">ShopOps Dashboard</h1>
-      <p className="text-slate-400">Phase 1 scaffold — API status: {apiStatus}</p>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
