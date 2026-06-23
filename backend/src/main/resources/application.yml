@@ -30,3 +30,7 @@ app:
     expiration-ms: ${JWT_EXPIRATION_MS:86400000}
   seed:
     enabled: ${SEED_ENABLED:true}
+  shopify:
+    store-domain: ${SHOPIFY_STORE_DOMAIN:}
+    access-token: ${SHOPIFY_ACCESS_TOKEN:}
+    api-version: ${SHOPIFY_API_VERSION:2025-01}

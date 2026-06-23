@@ -20,3 +20,7 @@ app:
     expiration-ms: 86400000
   seed:
     enabled: false
+  shopify:
+    store-domain:
+    access-token:
+    api-version: 2025-01

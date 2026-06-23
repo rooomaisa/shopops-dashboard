@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { fetchDashboardStats } from '../api/dashboard'
+import { fetchSyncStatus, syncAll } from '../api/sync'
 
 function StatCard({ label, value, to }) {
   return (
@@ -11,17 +12,50 @@ function StatCard({ label, value, to }) {
   )
 }
 
+function formatSyncedAt(value) {
+  if (!value) return 'Never'
+  return new Date(value).toLocaleString()
+}
+
 export default function DashboardPage() {
   const [stats, setStats] = useState(null)
+  const [syncStatus, setSyncStatus] = useState(null)
   const [error, setError] = useState('')
+  const [syncMessage, setSyncMessage] = useState('')
+  const [syncing, setSyncing] = useState(false)
 
-  useEffect(() => {
-    fetchDashboardStats()
-      .then(setStats)
-      .catch(() => setError('Could not load dashboard stats'))
+  const load = useCallback(() => {
+    Promise.all([fetchDashboardStats(), fetchSyncStatus()])
+      .then(([dashboardStats, status]) => {
+        setStats(dashboardStats)
+        setSyncStatus(status)
+      })
+      .catch(() => setError('Could not load dashboard'))
   }, [])
 
-  if (error) {
+  useEffect(() => {
+    load()
+  }, [load])
+
+  async function handleSync() {
+    setSyncing(true)
+    setSyncMessage('')
+    setError('')
+    try {
+      const results = await syncAll()
+      const summary = results
+        .map((r) => `${r.resource}: ${r.created} new, ${r.updated} updated`)
+        .join(' · ')
+      setSyncMessage(`Sync complete — ${summary}`)
+      load()
+    } catch (err) {
+      setError(err.response?.data?.message || 'Sync failed. Check Shopify credentials in backend/.env')
+    } finally {
+      setSyncing(false)
+    }
+  }
+
+  if (error && !stats) {
     return <p className="text-red-400">{error}</p>
   }
 
@@ -32,12 +66,45 @@ export default function DashboardPage() {
   return (
     <div>
       <h2 className="text-2xl font-bold mb-6">Dashboard</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <StatCard label="Products" value={stats.totalProducts} to="/products" />
         <StatCard label="Open orders" value={stats.openOrders} to="/orders" />
         <StatCard label="Processing" value={stats.processingOrders} to="/orders" />
         <StatCard label="Open alerts" value={stats.openAlerts} to="/alerts" />
       </div>
+
+      <section className="rounded-xl bg-slate-800 border border-slate-700 p-5">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h3 className="text-lg font-semibold">Shopify sync</h3>
+            <p className="text-slate-400 text-sm mt-1">
+              Pull products and orders from your Shopify dev store into ShopOps.
+            </p>
+            {syncStatus && (
+              <p className="text-slate-500 text-xs mt-2">
+                Products: {formatSyncedAt(syncStatus.productsLastSyncedAt)} · Orders:{' '}
+                {formatSyncedAt(syncStatus.ordersLastSyncedAt)}
+              </p>
+            )}
+            {!syncStatus?.shopifyConfigured && (
+              <p className="text-amber-400 text-xs mt-2">
+                Shopify not configured — add SHOPIFY_STORE_DOMAIN and SHOPIFY_ACCESS_TOKEN to backend/.env
+              </p>
+            )}
+          </div>
+          <button
+            type="button"
+            onClick={handleSync}
+            disabled={syncing || !syncStatus?.shopifyConfigured}
+            className="shrink-0 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {syncing ? 'Syncing…' : 'Sync now'}
+          </button>
+        </div>
+        {syncMessage && <p className="text-emerald-400 text-sm mt-3">{syncMessage}</p>}
+        {error && stats && <p className="text-red-400 text-sm mt-3">{error}</p>}
+      </section>
     </div>
   )
 }
