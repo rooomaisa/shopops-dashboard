@@ -6,8 +6,8 @@ import com.shopops.entity.Order;
 import com.shopops.entity.OrderLine;
 import com.shopops.entity.Product;
 import com.shopops.entity.StockAlert;
-import com.shopops.repository.OrderRepository;
 import com.shopops.entity.User;
+import com.shopops.repository.OrderRepository;
 import com.shopops.repository.ProductRepository;
 import com.shopops.repository.StockAlertRepository;
 import com.shopops.repository.UserRepository;
@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -25,29 +26,38 @@ import java.time.temporal.ChronoUnit;
 @ConditionalOnProperty(name = "app.seed.enabled", havingValue = "true")
 public class SeedDataRunner implements CommandLineRunner {
 
+    public static final String DEMO_EMAIL = "demo@shopops.dashboard";
+    public static final String DEMO_PASSWORD = "DemoShopOps2025!";
+    public static final String DEMO_NAME = "Demo User";
+
     private static final Logger log = LoggerFactory.getLogger(SeedDataRunner.class);
 
     private final ProductRepository productRepository;
     private final OrderRepository orderRepository;
     private final StockAlertRepository stockAlertRepository;
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public SeedDataRunner(
             ProductRepository productRepository,
             OrderRepository orderRepository,
             StockAlertRepository stockAlertRepository,
-            UserRepository userRepository
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder
     ) {
         this.productRepository = productRepository;
         this.orderRepository = orderRepository;
         this.stockAlertRepository = stockAlertRepository;
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public void run(String... args) {
+        ensureDemoUser();
+
         if (productRepository.count() > 0) {
-            log.info("Seed data already present — skipping");
+            log.info("Seed data already present — skipping product/order seed");
             return;
         }
 
@@ -61,12 +71,6 @@ public class SeedDataRunner implements CommandLineRunner {
                 "8.50", 50, "https://placehold.co/200x200?text=Soap");
         saveProduct("gid://shopify/Product/4", "Gift Box Set", "GB-004",
                 "29.99", 8, "https://placehold.co/200x200?text=Gift");
-
-        User owner = new User();
-        owner.setName("Bloom & Co Owner");
-        owner.setEmail("owner@bloomandco.example");
-        owner.setPassword("placeholder-until-auth-phase");
-        userRepository.save(owner);
 
         Order order1 = new Order();
         order1.setShopifyId("gid://shopify/Order/1001");
@@ -109,6 +113,27 @@ public class SeedDataRunner implements CommandLineRunner {
 
         log.info("Seed complete: {} products, {} orders, {} alerts",
                 productRepository.count(), orderRepository.count(), stockAlertRepository.count());
+    }
+
+    private void ensureDemoUser() {
+        userRepository.findByEmail(DEMO_EMAIL).ifPresentOrElse(
+                user -> {
+                    if (!passwordEncoder.matches(DEMO_PASSWORD, user.getPassword())) {
+                        user.setPassword(passwordEncoder.encode(DEMO_PASSWORD));
+                        user.setName(DEMO_NAME);
+                        userRepository.save(user);
+                        log.info("Updated demo user password");
+                    }
+                },
+                () -> {
+                    User demo = new User();
+                    demo.setName(DEMO_NAME);
+                    demo.setEmail(DEMO_EMAIL);
+                    demo.setPassword(passwordEncoder.encode(DEMO_PASSWORD));
+                    userRepository.save(demo);
+                    log.info("Created demo user {}", DEMO_EMAIL);
+                }
+        );
     }
 
     private Product saveProduct(String shopifyId, String title, String sku,
