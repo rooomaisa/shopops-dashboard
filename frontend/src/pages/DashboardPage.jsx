@@ -1,41 +1,43 @@
 import { useEffect, useState } from 'react'
-import { useAuth } from '../context/AuthContext'
+import { Link } from 'react-router-dom'
+import { fetchDashboardStats } from '../api/dashboard'
+
+function StatCard({ label, value, to }) {
+  return (
+    <Link to={to} className="block rounded-xl bg-slate-800 border border-slate-700 p-5 hover:border-emerald-600/50 transition">
+      <p className="text-slate-400 text-sm">{label}</p>
+      <p className="text-3xl font-bold mt-1">{value}</p>
+    </Link>
+  )
+}
 
 export default function DashboardPage() {
-  const { user, logout } = useAuth()
-  const [apiStatus, setApiStatus] = useState('checking...')
+  const [stats, setStats] = useState(null)
+  const [error, setError] = useState('')
 
   useEffect(() => {
-    fetch('/api/health')
-      .then((res) => res.json())
-      .then((data) => setApiStatus(data.database ?? data.status ?? 'unknown'))
-      .catch(() => setApiStatus('offline'))
+    fetchDashboardStats()
+      .then(setStats)
+      .catch(() => setError('Could not load dashboard stats'))
   }, [])
 
-  return (
-    <div className="min-h-screen bg-slate-900 text-white">
-      <header className="border-b border-slate-700 px-6 py-4 flex items-center justify-between">
-        <h1 className="text-xl font-bold">ShopOps Dashboard</h1>
-        <button
-          type="button"
-          onClick={logout}
-          className="text-sm text-slate-400 hover:text-white"
-        >
-          Log out
-        </button>
-      </header>
+  if (error) {
+    return <p className="text-red-400">{error}</p>
+  }
 
-      <main className="p-6 max-w-2xl">
-        <p className="text-slate-300">
-          Welcome, <span className="text-white font-medium">{user?.name}</span>
-        </p>
-        <p className="mt-2 text-slate-400 text-sm">
-          Phase 3 complete — you are logged in. Database: <span className="text-emerald-400">{apiStatus}</span>
-        </p>
-        <p className="mt-4 text-slate-500 text-sm">
-          Next up: products, orders, and alerts pages (Phase 4).
-        </p>
-      </main>
+  if (!stats) {
+    return <p className="text-slate-400">Loading...</p>
+  }
+
+  return (
+    <div>
+      <h2 className="text-2xl font-bold mb-6">Dashboard</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard label="Products" value={stats.totalProducts} to="/products" />
+        <StatCard label="Open orders" value={stats.openOrders} to="/orders" />
+        <StatCard label="Processing" value={stats.processingOrders} to="/orders" />
+        <StatCard label="Open alerts" value={stats.openAlerts} to="/alerts" />
+      </div>
     </div>
   )
 }
