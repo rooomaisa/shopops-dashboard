@@ -4,7 +4,7 @@
 
 > Portfolio project demonstrating business application development: domain modeling, workflow automation, and external system integration (Shopify Admin API + webhooks).
 
-**Status:** In development — Phase 0 (planning)
+**Status:** Phase 1 scaffold complete — backend + frontend run locally
 
 ---
 
