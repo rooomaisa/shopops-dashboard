@@ -42,6 +42,7 @@ Restart the Spring Boot backend after saving `.env`.
 
 - **`shop_not_permitted`**: Your dev store must be created from the Dev Dashboard (Winkels), not from the store admin.
 - **App not installed**: Install from the app's **Home** tab before syncing.
+- **Protected customer data / orders blocked**: Shopify's new Dev Dashboard often has no "API access requests" UI. ShopOps syncs orders without customer email. Products should still sync; order sync may show a warning but won't crash the whole sync.
 
 ## Mendix lens
 

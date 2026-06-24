@@ -117,7 +117,7 @@ public class ShopifySyncService {
                 order.setInternalStatus(InternalOrderStatus.NEW);
             }
             order.setTotalPrice(parseDecimal(node.path("total_price").asText("0")));
-            order.setCustomerEmail(textOrNull(node, "email"));
+            order.setCustomerEmail(null);
             order.setOrderCreatedAt(parseInstant(node.path("created_at").asText()));
             order.setLastSyncedAt(syncedAt);
 
