@@ -11,13 +11,14 @@ import org.springframework.web.client.RestClientResponseException;
 public class ShopifyClient {
 
     private final ShopifyProperties properties;
+    private final ShopifyTokenProvider tokenProvider;
     private final RestClient restClient;
 
-    public ShopifyClient(ShopifyProperties properties) {
+    public ShopifyClient(ShopifyProperties properties, ShopifyTokenProvider tokenProvider) {
         this.properties = properties;
+        this.tokenProvider = tokenProvider;
         this.restClient = RestClient.builder()
                 .baseUrl(properties.baseUrl())
-                .defaultHeader("X-Shopify-Access-Token", properties.accessToken() != null ? properties.accessToken() : "")
                 .build();
     }
 
@@ -38,11 +39,14 @@ public class ShopifyClient {
         try {
             return restClient.get()
                     .uri(path)
+                    .header("X-Shopify-Access-Token", tokenProvider.getAccessToken())
                     .retrieve()
                     .body(JsonNode.class);
         } catch (RestClientResponseException ex) {
             throw new ApiException(ex.getStatusCode().value(),
                     "Shopify API error: " + ex.getResponseBodyAsString());
+        } catch (ApiException ex) {
+            throw ex;
         } catch (Exception ex) {
             throw new ApiException(502, "Could not reach Shopify: " + ex.getMessage());
         }
@@ -50,7 +54,8 @@ public class ShopifyClient {
 
     private void ensureConfigured() {
         if (!isConfigured()) {
-            throw new ApiException(503, "Shopify is not configured. Add SHOPIFY_STORE_DOMAIN and SHOPIFY_ACCESS_TOKEN to .env");
+            throw new ApiException(503,
+                    "Shopify is not configured. Add SHOPIFY_STORE_DOMAIN plus SHOPIFY_CLIENT_ID and SHOPIFY_CLIENT_SECRET to .env");
         }
     }
 }

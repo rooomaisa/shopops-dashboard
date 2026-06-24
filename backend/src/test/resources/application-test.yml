@@ -23,4 +23,6 @@ app:
   shopify:
     store-domain:
     access-token:
+    client-id:
+    client-secret:
     api-version: 2025-01

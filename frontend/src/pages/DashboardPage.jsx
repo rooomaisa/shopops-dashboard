@@ -89,7 +89,7 @@ export default function DashboardPage() {
             )}
             {!syncStatus?.shopifyConfigured && (
               <p className="text-amber-400 text-xs mt-2">
-                Shopify not configured — add SHOPIFY_STORE_DOMAIN and SHOPIFY_ACCESS_TOKEN to backend/.env
+                Shopify not configured — add SHOPIFY_STORE_DOMAIN, SHOPIFY_CLIENT_ID and SHOPIFY_CLIENT_SECRET to backend/.env
               </p>
             )}
           </div>
