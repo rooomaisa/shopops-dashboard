@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { fetchOrder, updateOrderStatus } from '../api/orders'
 import StatusBadge from '../components/StatusBadge'
+import DataSourceBadge from '../components/DataSourceBadge'
 import { nextOrderActionLabel, nextOrderStatus, orderStatusClass } from '../utils/status'
 
 export default function OrderDetailPage() {
@@ -49,8 +50,11 @@ export default function OrderDetailPage() {
       <Link to="/orders" className="text-sm text-slate-400 hover:text-white">← Back to orders</Link>
       <div className="mt-4 flex items-start justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold">{order.orderNumber}</h2>
-          <p className="text-slate-400 mt-1">{order.customerEmail}</p>
+          <div className="flex flex-wrap items-center gap-3">
+            <h2 className="text-2xl font-bold">{order.orderNumber}</h2>
+            <DataSourceBadge source={order.lastSyncedAt ? 'shopify' : 'demo'} />
+          </div>
+          <p className="text-slate-400 mt-1">{order.customerEmail ?? 'No customer email (demo or Shopify PII restricted)'}</p>
         </div>
         <StatusBadge label={order.internalStatus} className={orderStatusClass(order.internalStatus)} />
       </div>

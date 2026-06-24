@@ -142,7 +142,8 @@ public class ShopOpsService {
                 order.getInternalStatus(),
                 order.getTotalPrice(),
                 order.getCustomerEmail(),
-                order.getOrderCreatedAt()
+                order.getOrderCreatedAt(),
+                order.getLastSyncedAt()
         );
     }
 

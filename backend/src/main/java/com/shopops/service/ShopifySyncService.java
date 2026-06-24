@@ -39,18 +39,24 @@ public class ShopifySyncService {
     }
 
     public SyncStatusResponse getSyncStatus() {
+        var products = productRepository.findAll();
+        var orders = orderRepository.findAll();
+
         return new SyncStatusResponse(
                 shopifyClient.isConfigured(),
-                productRepository.findAll().stream()
+                products.stream()
                         .map(Product::getLastSyncedAt)
                         .filter(java.util.Objects::nonNull)
                         .max(Comparator.naturalOrder())
                         .orElse(null),
-                orderRepository.findAll().stream()
+                orders.stream()
                         .map(Order::getLastSyncedAt)
                         .filter(java.util.Objects::nonNull)
                         .max(Comparator.naturalOrder())
-                        .orElse(null)
+                        .orElse(null),
+                products.stream().filter(p -> p.getLastSyncedAt() != null).count(),
+                orders.stream().filter(o -> o.getLastSyncedAt() != null).count(),
+                orders.stream().filter(o -> o.getLastSyncedAt() == null).count()
         );
     }
 

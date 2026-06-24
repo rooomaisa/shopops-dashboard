@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { fetchDashboardStats } from '../api/dashboard'
 import { fetchSyncStatus, syncAll } from '../api/sync'
+import InfoBanner from '../components/InfoBanner'
 
 function StatCard({ label, value, to }) {
   return (
@@ -81,12 +82,23 @@ export default function DashboardPage() {
         <StatCard label="Open alerts" value={stats.openAlerts} to="/alerts" />
       </div>
 
+      {syncStatus?.shopifyConfigured && (
+        <InfoBanner title="How this demo works" variant="info">
+          <strong className="text-white">Products</strong> sync live from Shopify ({syncStatus.shopifySyncedProductCount} synced).
+          {' '}<strong className="text-white">Orders</strong> use internal workflow data
+          {syncStatus.shopifySyncedOrderCount > 0
+            ? ` (${syncStatus.shopifySyncedOrderCount} from Shopify, ${syncStatus.demoOrderCount} demo)`
+            : ` (${syncStatus.demoOrderCount} demo orders — Shopify blocks order API on dev apps)`}.
+          Click an order and advance it through Processing → Shipped to see the ops flow.
+        </InfoBanner>
+      )}
+
       <section className="rounded-xl bg-slate-800 border border-slate-700 p-5">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h3 className="text-lg font-semibold">Shopify sync</h3>
             <p className="text-slate-400 text-sm mt-1">
-              Pull products and orders from your Shopify dev store into ShopOps.
+              Pull your product catalog from Shopify. Order workflow uses internal demo data.
             </p>
             {syncStatus && (
               <p className="text-slate-500 text-xs mt-2">
