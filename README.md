@@ -4,9 +4,27 @@
 
 > Portfolio project demonstrating business application development: domain modeling, workflow automation, and external system integration (Shopify Admin API).
 
-**Status:** Phase 5 complete — live Shopify product sync + ops workflow UI
+**Status:** Ready to deploy — see [docs/deploy.md](docs/deploy.md)
 
-**Case study:** [docs/portfolio-case-study.md](docs/portfolio-case-study.md)
+**Case study:** [docs/portfolio-case-study.md](docs/portfolio-case-study.md) · **Demo script:** [docs/demo-script.md](docs/demo-script.md)
+
+---
+
+## Live demo
+
+| | |
+|--|--|
+| **App** | _Add your Vercel URL after deploy_ |
+| **API** | _Add your Render URL after deploy_ |
+| **Login** | `demo@shopops.dashboard` / `DemoShopOps2025!` |
+
+### Screenshots
+
+_Add after deploy — save PNGs to `docs/screenshots/`_
+
+| Dashboard | Products | Orders |
+|-----------|----------|--------|
+| ![Dashboard](docs/screenshots/dashboard.png) | ![Products](docs/screenshots/products.png) | ![Orders](docs/screenshots/orders.png) |
 
 ---
 
@@ -41,12 +59,17 @@ cd backend && ./mvnw spring-boot:run
 cd frontend && npm run dev
 ```
 
-Open `http://localhost:5174` and log in:
+Open `http://localhost:5174` and log in with the demo credentials above.
 
-- **Email:** `demo@shopops.dashboard`
-- **Password:** `DemoShopOps2025!`
+## Deploy (production)
 
-Click **Sync now** on the dashboard to pull products from Shopify.
+Step-by-step guide (Render + Vercel + Supabase): **[docs/deploy.md](docs/deploy.md)**
+
+| Layer | Host |
+|-------|------|
+| Frontend | Vercel (`frontend/`) |
+| Backend | Render (`backend/Dockerfile`) |
+| Database | Supabase PostgreSQL |
 
 ## Architecture
 
@@ -56,7 +79,7 @@ Click **Sync now** on the dashboard to pull products from Shopify.
 | Backend | Java 21, Spring Boot |
 | Database | PostgreSQL (Supabase) |
 | External | Shopify Admin API |
-| Deployment | Vercel + Render (Phase 8) |
+| Deployment | Vercel + Render |
 
 See [docs/domain-model.md](docs/domain-model.md) for the data model and [docs/shopify-setup.md](docs/shopify-setup.md) for Shopify credentials.
 
@@ -68,16 +91,16 @@ See [docs/domain-model.md](docs/domain-model.md) for the data model and [docs/sh
 | Microflows | Low-stock check, order status transitions |
 | Pages | Dashboard, product list, order detail, alerts |
 | REST integration | Shopify Admin API product sync |
-| Event handlers | Shopify webhooks (Phase 6) |
+| Event handlers | Shopify webhooks (future) |
 
 ## Development phases
 
 | Phase | Status | Focus |
 |-------|--------|-------|
-| 0–4 | ✅ | Domain model, scaffold, data, auth, CRUD UI |
-| 5 | ✅ | Shopify product sync + client credentials auth |
-| 6–7 | Planned | Webhooks, stock alert automation |
-| 8 | Planned | Deploy + screenshots |
+| 0–5 | ✅ | Domain model, scaffold, auth, CRUD, Shopify sync |
+| Portfolio polish | ✅ | Live vs demo labels, case study |
+| 8 | ✅ | Deploy config + guides |
+| 6–7 | Optional | Webhooks, alert automation |
 
 ## Author
 
