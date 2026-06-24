@@ -1,107 +1,110 @@
 # ShopOps Dashboard
 
-**Internal operations dashboard for e-commerce** — live Shopify product catalog sync, warehouse order workflow, and low-stock alerts.
+**Internal operations dashboard for e-commerce** — sync products from Shopify, run warehouse order workflows, and track low-stock alerts.
 
-> Portfolio project demonstrating business application development: domain modeling, workflow automation, and external system integration (Shopify Admin API).
+[![Live Demo](https://img.shields.io/badge/demo-live-22c55e?style=for-the-badge)](https://shopops-dashboard.vercel.app)
+[![React](https://img.shields.io/badge/React-19-61dafb?style=flat-square&logo=react&logoColor=white)](https://react.dev)
+[![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5-6db33f?style=flat-square&logo=spring&logoColor=white)](https://spring.io)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Supabase-4169e1?style=flat-square&logo=postgresql&logoColor=white)](https://supabase.com)
+[![Shopify](https://img.shields.io/badge/Shopify-Admin_API-95bf47?style=flat-square&logo=shopify&logoColor=white)](https://shopify.dev)
 
-**Status:** Ready to deploy — see [docs/deploy.md](docs/deploy.md)
-
-**Case study:** [docs/portfolio-case-study.md](docs/portfolio-case-study.md) · **Demo script:** [docs/demo-script.md](docs/demo-script.md)
+> Built as a portfolio project for **business application development** — domain modeling, workflow states, REST integrations, and a deployable full-stack app.
 
 ---
 
-## Live demo
+## Try it live
 
 | | |
-|--|--|
-| **App** | _Add your Vercel URL after deploy_ |
-| **API** | _Add your Render URL after deploy_ |
-| **Login** | `demo@shopops.dashboard` / `DemoShopOps2025!` |
+|---|---|
+| **App** | **[shopops-dashboard.vercel.app](https://shopops-dashboard.vercel.app)** |
+| **Login** | `demo@shopops.dashboard` |
+| **Password** | `DemoShopOps2025!` |
 
-### Screenshots
-
-_Add after deploy — save PNGs to `docs/screenshots/`_
-
-| Dashboard | Products | Orders |
-|-----------|----------|--------|
-| ![Dashboard](docs/screenshots/dashboard.png) | ![Products](docs/screenshots/products.png) | ![Orders](docs/screenshots/orders.png) |
+Click **Sync now** on the dashboard to pull products from a real Shopify dev store.
 
 ---
 
-## The problem
+## What it does
 
-Small e-commerce businesses sell through **Shopify**, but Shopify is built for *selling*, not for *operating*:
+ShopOps sits **next to** Shopify — Shopify handles sales, ShopOps handles operations:
 
-- Warehouse staff have no single view of which orders still need shipping
-- Low-stock products are easy to miss until a customer orders something unavailable
-- Ops teams must log into Shopify admin for tasks that could live in a focused internal tool
-
-## The solution
-
-ShopOps Dashboard sits **next to** Shopify (not replacing it):
+- **Product catalog** — live sync from Shopify Admin API (REST + OAuth client credentials)
+- **Order workflow** — internal status flow: New → Processing → Shipped → Completed
+- **Stock alerts** — low-inventory warnings for warehouse staff
+- **Clear data labels** — live Shopify data vs demo workflow data, shown in the UI
 
 ```
-Shopify (sales)  →  product sync  →  ShopOps (operations)  →  workflow + alerts
+Shopify (sales)  →  product sync  →  ShopOps (ops dashboard)  →  workflow + alerts
 ```
 
-1. **Sync** product catalog from a Shopify development store (live REST integration)
-2. **Track** internal order status: New → Processing → Shipped → Completed
-3. **Alert** when product stock drops below a threshold
-4. **Label** data sources clearly — live Shopify vs demo workflow data
+---
 
-## Try it locally
+## Screenshots
+
+### Dashboard
+![ShopOps dashboard with stats and Shopify sync](docs/screenshots/dashboard.png)
+
+### Products — live from Shopify
+![Product list with Live from Shopify badges](docs/screenshots/products.png)
+
+### Orders — internal fulfillment workflow
+![Orders list with workflow status badges](docs/screenshots/orders.png)
+
+---
+
+## Tech stack
+
+| Layer | Technology |
+|-------|------------|
+| Frontend | React, Vite, Tailwind CSS |
+| Backend | Java 21, Spring Boot 3, JWT auth |
+| Database | PostgreSQL (Supabase) |
+| Integration | Shopify Admin API |
+| Hosting | Vercel (frontend) + Render (backend) |
+
+**API health:** [shopops-api-d83u.onrender.com/api/health](https://shopops-api-d83u.onrender.com/api/health)
+
+---
+
+## Why this project (Mendix / low-code angle)
+
+Mirrors how business apps are built on platforms like Mendix:
+
+| Concept | In ShopOps |
+|---------|------------|
+| Domain model | Product, Order, OrderLine, StockAlert, User |
+| Enumerations | Order status, alert status |
+| Microflows | Status transitions, stock threshold checks |
+| REST consume | Shopify product sync |
+| Pages | Dashboard, products, orders, alerts |
+
+---
+
+## Run locally
 
 ```bash
-# Backend (requires backend/.env — see backend/.env.example)
+# Backend — copy backend/.env.example → backend/.env first
 cd backend && ./mvnw spring-boot:run
 
 # Frontend
 cd frontend && npm run dev
 ```
 
-Open `http://localhost:5174` and log in with the demo credentials above.
+Open `http://localhost:5174` — same demo login as above.
 
-## Deploy (production)
+---
 
-Step-by-step guide (Render + Vercel + Supabase): **[docs/deploy.md](docs/deploy.md)**
+## Project docs
 
-| Layer | Host |
-|-------|------|
-| Frontend | Vercel (`frontend/`) |
-| Backend | Render (`backend/Dockerfile`) |
-| Database | Supabase PostgreSQL |
+| Doc | Purpose |
+|-----|---------|
+| [domain-model.md](docs/domain-model.md) | Entities, business rules |
+| [portfolio-case-study.md](docs/portfolio-case-study.md) | Interview talking points |
+| [deploy.md](docs/deploy.md) | Render + Vercel setup |
 
-## Architecture
-
-| Layer | Technology |
-|-------|------------|
-| Frontend | React, Vite, Tailwind CSS |
-| Backend | Java 21, Spring Boot |
-| Database | PostgreSQL (Supabase) |
-| External | Shopify Admin API |
-| Deployment | Vercel + Render |
-
-See [docs/domain-model.md](docs/domain-model.md) for the data model and [docs/shopify-setup.md](docs/shopify-setup.md) for Shopify credentials.
-
-## Relevance to low-code / Mendix
-
-| Mendix concept | ShopOps implementation |
-|----------------|------------------------|
-| Domain model | Product, Order, OrderLine, StockAlert, User |
-| Microflows | Low-stock check, order status transitions |
-| Pages | Dashboard, product list, order detail, alerts |
-| REST integration | Shopify Admin API product sync |
-| Event handlers | Shopify webhooks (future) |
-
-## Development phases
-
-| Phase | Status | Focus |
-|-------|--------|-------|
-| 0–5 | ✅ | Domain model, scaffold, auth, CRUD, Shopify sync |
-| Portfolio polish | ✅ | Live vs demo labels, case study |
-| 8 | ✅ | Deploy config + guides |
-| 6–7 | Optional | Webhooks, alert automation |
+---
 
 ## Author
 
-Romy van Dam — [GitHub](https://github.com/rooomaisa)
+**Romy van Dam** — junior developer · Mendix traineeship candidate  
+[GitHub](https://github.com/rooomaisa) · [Live demo](https://shopops-dashboard.vercel.app)
