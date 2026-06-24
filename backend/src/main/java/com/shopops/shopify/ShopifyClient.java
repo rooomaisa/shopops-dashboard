@@ -31,7 +31,8 @@ public class ShopifyClient {
     }
 
     public JsonNode fetchOrders() {
-        return get("/orders.json?status=any&limit=250");
+        return get("/orders.json?status=any&limit=250"
+                + "&fields=id,name,financial_status,total_price,created_at,line_items");
     }
 
     private JsonNode get(String path) {
@@ -43,8 +44,7 @@ public class ShopifyClient {
                     .retrieve()
                     .body(JsonNode.class);
         } catch (RestClientResponseException ex) {
-            throw new ApiException(ex.getStatusCode().value(),
-                    "Shopify API error: " + ex.getResponseBodyAsString());
+            throw ShopifyApiErrors.fromResponse(ex);
         } catch (ApiException ex) {
             throw ex;
         } catch (Exception ex) {

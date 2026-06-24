@@ -65,8 +65,7 @@ public class ShopifyTokenProvider {
             tokenExpiresAt = Instant.now().plusSeconds(expiresIn);
             return cachedToken;
         } catch (RestClientResponseException ex) {
-            throw new ApiException(ex.getStatusCode().value(),
-                    "Shopify token error: " + ex.getResponseBodyAsString());
+            throw ShopifyApiErrors.fromResponse(ex);
         } catch (ApiException ex) {
             throw ex;
         } catch (Exception ex) {

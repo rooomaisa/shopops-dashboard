@@ -42,11 +42,16 @@ export default function DashboardPage() {
     setSyncMessage('')
     setError('')
     try {
-      const results = await syncAll()
+      const response = await syncAll()
+      const results = response.results ?? response
+      const warnings = response.warnings ?? []
       const summary = results
         .map((r) => `${r.resource}: ${r.created} new, ${r.updated} updated`)
         .join(' · ')
       setSyncMessage(`Sync complete — ${summary}`)
+      if (warnings.length > 0) {
+        setError(warnings.join(' '))
+      }
       load()
     } catch (err) {
       setError(err.response?.data?.message || 'Sync failed. Check Shopify credentials in backend/.env')
