@@ -9,6 +9,7 @@ import com.shopops.entity.OrderLine;
 import com.shopops.entity.Product;
 import com.shopops.repository.OrderRepository;
 import com.shopops.repository.ProductRepository;
+import com.shopops.repository.StockAlertRepository;
 import com.shopops.shopify.ShopifyClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,15 +28,18 @@ public class ShopifySyncService {
     private final ShopifyClient shopifyClient;
     private final ProductRepository productRepository;
     private final OrderRepository orderRepository;
+    private final StockAlertRepository stockAlertRepository;
 
     public ShopifySyncService(
             ShopifyClient shopifyClient,
             ProductRepository productRepository,
-            OrderRepository orderRepository
+            OrderRepository orderRepository,
+            StockAlertRepository stockAlertRepository
     ) {
         this.shopifyClient = shopifyClient;
         this.productRepository = productRepository;
         this.orderRepository = orderRepository;
+        this.stockAlertRepository = stockAlertRepository;
     }
 
     public SyncStatusResponse getSyncStatus() {
@@ -97,7 +101,42 @@ public class ShopifySyncService {
             else updated++;
         }
 
+        removeLegacySeedProducts();
+
         return new SyncResultResponse("products", created, updated, created + updated, syncedAt);
+    }
+
+    private void removeLegacySeedProducts() {
+        var legacyProducts = productRepository.findAll().stream()
+                .filter(product -> isLegacySeedProduct(product.getShopifyId()))
+                .toList();
+
+        for (Product product : legacyProducts) {
+            stockAlertRepository.deleteByProductId(product.getId());
+            orderRepository.findAll().forEach(order -> {
+                boolean changed = false;
+                for (OrderLine line : order.getLines()) {
+                    if (line.getProduct() != null && product.getId().equals(line.getProduct().getId())) {
+                        line.setProduct(null);
+                        changed = true;
+                    }
+                }
+                if (changed) {
+                    orderRepository.save(order);
+                }
+            });
+            productRepository.delete(product);
+        }
+    }
+
+    private boolean isLegacySeedProduct(String shopifyId) {
+        if (shopifyId == null) {
+            return false;
+        }
+        if (shopifyId.startsWith("seed://product/")) {
+            return true;
+        }
+        return shopifyId.matches("gid://shopify/Product/[1-4]");
     }
 
     @Transactional

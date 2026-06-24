@@ -63,37 +63,35 @@ public class SeedDataRunner implements CommandLineRunner {
 
         log.info("Seeding demo products, orders, and alerts...");
 
-        Product candle = saveProduct("gid://shopify/Product/1", "Lavender Candle", "LC-001",
+        Product candle = saveProduct("seed://product/1", "Lavender Candle", "LC-001",
                 "14.99", 3, "https://placehold.co/200x200?text=Candle");
-        Product mug = saveProduct("gid://shopify/Product/2", "Ceramic Mug", "CM-002",
+        Product mug = saveProduct("seed://product/2", "Ceramic Mug", "CM-002",
                 "12.00", 2, "https://placehold.co/200x200?text=Mug");
-        Product soap = saveProduct("gid://shopify/Product/3", "Handmade Soap", "HS-003",
+        Product soap = saveProduct("seed://product/3", "Handmade Soap", "HS-003",
                 "8.50", 50, "https://placehold.co/200x200?text=Soap");
-        saveProduct("gid://shopify/Product/4", "Gift Box Set", "GB-004",
+        saveProduct("seed://product/4", "Gift Box Set", "GB-004",
                 "29.99", 8, "https://placehold.co/200x200?text=Gift");
 
         Order order1 = new Order();
-        order1.setShopifyId("gid://shopify/Order/1001");
+        order1.setShopifyId("seed://order/1001");
         order1.setOrderNumber("#1001");
         order1.setShopifyStatus("paid");
         order1.setInternalStatus(InternalOrderStatus.NEW);
         order1.setTotalPrice(new BigDecimal("26.99"));
         order1.setCustomerEmail("customer1@example.com");
         order1.setOrderCreatedAt(Instant.now().minus(2, ChronoUnit.DAYS));
-        order1.setLastSyncedAt(Instant.now());
         order1.getLines().add(line(order1, candle, 1, "14.99"));
         order1.getLines().add(line(order1, mug, 1, "12.00"));
         orderRepository.save(order1);
 
         Order order2 = new Order();
-        order2.setShopifyId("gid://shopify/Order/1002");
+        order2.setShopifyId("seed://order/1002");
         order2.setOrderNumber("#1002");
         order2.setShopifyStatus("paid");
         order2.setInternalStatus(InternalOrderStatus.PROCESSING);
         order2.setTotalPrice(new BigDecimal("8.50"));
         order2.setCustomerEmail("customer2@example.com");
         order2.setOrderCreatedAt(Instant.now().minus(1, ChronoUnit.DAYS));
-        order2.setLastSyncedAt(Instant.now());
         order2.getLines().add(line(order2, soap, 1, "8.50"));
         orderRepository.save(order2);
 
@@ -145,7 +143,6 @@ public class SeedDataRunner implements CommandLineRunner {
         product.setPrice(new BigDecimal(price));
         product.setInventoryQuantity(stock);
         product.setImageUrl(imageUrl);
-        product.setLastSyncedAt(Instant.now());
         return productRepository.save(product);
     }
 
