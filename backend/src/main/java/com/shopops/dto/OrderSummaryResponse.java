@@ -12,6 +12,7 @@ public record OrderSummaryResponse(
         InternalOrderStatus internalStatus,
         BigDecimal totalPrice,
         String customerEmail,
-        Instant orderCreatedAt
+        Instant orderCreatedAt,
+        Instant lastSyncedAt
 ) {
 }

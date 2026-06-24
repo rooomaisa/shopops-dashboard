@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { fetchOrders } from '../api/orders'
+import DataSourceBadge from '../components/DataSourceBadge'
+import InfoBanner from '../components/InfoBanner'
 import StatusBadge from '../components/StatusBadge'
 import { orderStatusClass } from '../utils/status'
 
@@ -16,14 +18,40 @@ export default function OrdersPage() {
 
   if (loading) return <p className="text-slate-400">Loading orders...</p>
 
+  const shopifyCount = orders.filter((o) => o.lastSyncedAt).length
+  const demoCount = orders.length - shopifyCount
+
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-6">Orders</h2>
+      <div className="flex flex-wrap items-center gap-3 mb-6">
+        <h2 className="text-2xl font-bold">Orders</h2>
+        <DataSourceBadge source={shopifyCount > 0 ? 'shopify' : 'demo'} />
+      </div>
+
+      <InfoBanner title="Internal fulfillment workflow">
+        {shopifyCount > 0 ? (
+          <>
+            {shopifyCount} order{shopifyCount === 1 ? '' : 's'} synced from Shopify.
+            Warehouse staff move orders through <strong className="text-white">New → Processing → Shipped → Completed</strong>.
+          </>
+        ) : (
+          <>
+            Orders use <strong className="text-white">demo data</strong> to showcase the warehouse workflow.
+            Shopify blocks order API access on Dev Dashboard apps until protected-customer-data is approved —
+            the product catalog still syncs live from Shopify.
+          </>
+        )}
+        {demoCount > 0 && shopifyCount > 0 && (
+          <> · {demoCount} demo order{demoCount === 1 ? '' : 's'} kept for testing.</>
+        )}
+      </InfoBanner>
+
       <div className="rounded-xl border border-slate-700 overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-slate-800 text-slate-400">
             <tr>
               <th className="text-left p-3">Order</th>
+              <th className="text-left p-3">Source</th>
               <th className="text-left p-3">Customer</th>
               <th className="text-left p-3">Shopify</th>
               <th className="text-left p-3">Internal status</th>
@@ -37,6 +65,9 @@ export default function OrdersPage() {
                   <Link to={`/orders/${o.id}`} className="text-emerald-400 hover:underline font-medium">
                     {o.orderNumber}
                   </Link>
+                </td>
+                <td className="p-3">
+                  <DataSourceBadge source={o.lastSyncedAt ? 'shopify' : 'demo'} />
                 </td>
                 <td className="p-3 text-slate-400">{o.customerEmail ?? '—'}</td>
                 <td className="p-3 text-slate-400">{o.shopifyStatus}</td>

@@ -5,6 +5,9 @@ import java.time.Instant;
 public record SyncStatusResponse(
         boolean shopifyConfigured,
         Instant productsLastSyncedAt,
-        Instant ordersLastSyncedAt
+        Instant ordersLastSyncedAt,
+        long shopifySyncedProductCount,
+        long shopifySyncedOrderCount,
+        long demoOrderCount
 ) {
 }
