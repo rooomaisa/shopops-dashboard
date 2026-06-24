@@ -20,8 +20,8 @@ final class ShopifyApiErrors {
         }
 
         if (body.contains("protected customer data") || body.contains("protected customer fields")) {
-            return "Shopify blocked order data (protected customer info). Products can still sync. "
-                    + "Orders will sync without customer email, or use seed orders for the demo.";
+            return "Orders skipped: Shopify blocks order API on Dev Dashboard apps (customer data approval). "
+                    + "Products synced fine — use the Orders page demo data for workflow.";
         }
 
         if (body.contains("shop_not_permitted")) {

@@ -21,6 +21,7 @@ export default function DashboardPage() {
   const [stats, setStats] = useState(null)
   const [syncStatus, setSyncStatus] = useState(null)
   const [error, setError] = useState('')
+  const [warning, setWarning] = useState('')
   const [syncMessage, setSyncMessage] = useState('')
   const [syncing, setSyncing] = useState(false)
 
@@ -41,6 +42,7 @@ export default function DashboardPage() {
     setSyncing(true)
     setSyncMessage('')
     setError('')
+    setWarning('')
     try {
       const response = await syncAll()
       const results = response.results ?? response
@@ -50,7 +52,7 @@ export default function DashboardPage() {
         .join(' · ')
       setSyncMessage(`Sync complete — ${summary}`)
       if (warnings.length > 0) {
-        setError(warnings.join(' '))
+        setWarning(warnings.join(' '))
       }
       load()
     } catch (err) {
@@ -108,6 +110,7 @@ export default function DashboardPage() {
           </button>
         </div>
         {syncMessage && <p className="text-emerald-400 text-sm mt-3">{syncMessage}</p>}
+        {warning && <p className="text-amber-400 text-sm mt-3">{warning}</p>}
         {error && stats && <p className="text-red-400 text-sm mt-3">{error}</p>}
       </section>
     </div>
