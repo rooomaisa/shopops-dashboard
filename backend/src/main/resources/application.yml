@@ -33,4 +33,6 @@ app:
   shopify:
     store-domain: ${SHOPIFY_STORE_DOMAIN:}
     access-token: ${SHOPIFY_ACCESS_TOKEN:}
+    client-id: ${SHOPIFY_CLIENT_ID:}
+    client-secret: ${SHOPIFY_CLIENT_SECRET:}
     api-version: ${SHOPIFY_API_VERSION:2025-01}
